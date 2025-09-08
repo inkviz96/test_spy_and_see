@@ -60,18 +60,14 @@ async def login(  # noqa: WPS217
     login_data: LoginSchema,
     user_repository: UserRepository = Depends(get_user_repository),
 ):
-    """Login for OTP.
+    """Login.
 
     Args:
         request: The request object.
         login_data: Login data.
-        auth_service: Auth service.
-        device_bind_service: Device bind service.
-        auth_attempt_repository: Auth attempt repository.
 
     Returns:
         TokenPair: Access and refresh tokens if user second factor authentication is disabled.
-        LoginOTPTypeResponse: Login OTP type response schema if user second factor authentication is enabled.
 
     Raises:
         WrongCredentialsHTTPException: If user does not authenticate.
