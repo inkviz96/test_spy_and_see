@@ -1,0 +1,55 @@
+version: '3.9'
+name: notification-service
+services:
+  backend:
+    container_name: notification-service-api
+    build:
+      context: .
+      dockerfile: compose/Dockerfile
+    working_dir: /code/src
+    command: >
+      sh -c "(cd .. && alembic upgrade head) && gunicorn main:app -c gunicorn_config.py --reload"
+    ports:
+      - "8081:80"
+    expose:
+      - 8081
+    env_file:
+      - .env
+    volumes:
+        - ./src:/code/src
+    depends_on:
+      - db
+      - redis
+    networks:
+      notification_service:
+        aliases:
+          - notification-service.local
+
+  db:
+    image: postgres:14-alpine
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - 5433
+    ports:
+      - 5433:5433
+    command: -p 5433
+    networks:
+      - notification_service
+    volumes:
+      - postgres-data-local:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:7-alpine3.18
+    ports:
+      - '${REDIS_PORT}:6379'
+    networks:
+      - notification_service
+
+volumes:
+  postgres-data-local:
+
+networks:
+  notification_service:
+    name: 'our_network'
